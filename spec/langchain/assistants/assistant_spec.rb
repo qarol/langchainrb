@@ -41,15 +41,6 @@ RSpec.describe Langchain::Assistant do
       end
     end
 
-    describe "#replace_system_message!" do
-      it "replaces the system message" do
-        assistant = described_class.new(llm: llm)
-        assistant.add_message(content: "foo")
-        assistant.send(:replace_system_message!, content: "bar")
-        expect(assistant.messages.first.content).to eq("bar")
-      end
-    end
-
     describe "#array_of_message_hashes" do
       let(:messages) {
         [
@@ -472,7 +463,9 @@ RSpec.describe Langchain::Assistant do
     describe "#instructions=" do
       it "resets instructions" do
         subject.instructions = "New instructions"
-        expect(subject.messages.first.content).to eq("New instructions")
+        expect(subject.messages).to match_array(
+          an_object_having_attributes(role: "system", content: "New instructions")
+        )
         expect(subject.instructions).to eq("New instructions")
       end
     end
@@ -829,7 +822,9 @@ RSpec.describe Langchain::Assistant do
     describe "#instructions=" do
       it "resets instructions" do
         subject.instructions = "New instructions"
-        expect(subject.messages.first.content).to eq("New instructions")
+        expect(subject.messages).to match_array(
+          an_object_having_attributes(role: "system", content: "New instructions")
+        )
         expect(subject.instructions).to eq("New instructions")
       end
     end
@@ -855,8 +850,8 @@ RSpec.describe Langchain::Assistant do
     describe "#instructions=" do
       it "resets instructions" do
         subject.instructions = "New instructions"
-        expect(subject).not_to receive(:replace_system_message!)
         expect(subject.instructions).to eq("New instructions")
+        expect(subject.messages).to be_empty
       end
     end
   end
@@ -1037,8 +1032,12 @@ RSpec.describe Langchain::Assistant do
     describe "#instructions=" do
       it "resets instructions" do
         subject.instructions = "New instructions"
-        expect(subject).not_to receive(:replace_system_message!)
         expect(subject.instructions).to eq("New instructions")
+        expect(subject.messages).to be_empty
+
+        subject.instructions = "Another set of instructions"
+        expect(subject.instructions).to eq("Another set of instructions")
+        expect(subject.messages).to be_empty
       end
     end
   end
@@ -1261,9 +1260,33 @@ RSpec.describe Langchain::Assistant do
         expect { subject.tool_choice = "invalid_choice" }.to raise_error(ArgumentError)
       end
     end
+
+    describe "#instructions=" do
+      it "resets instructions" do
+        subject.instructions = "New instructions"
+        expect(subject.instructions).to eq("New instructions")
+        expect(subject.messages).to be_empty
+
+        subject.instructions = "Another set of instructions"
+        expect(subject.instructions).to eq("Another set of instructions")
+        expect(subject.messages).to be_empty
+      end
+    end
   end
 
-  xdescribe "when llm is Ollama" do
+  describe "when llm is Ollama" do
+    let(:llm) { Langchain::LLM::Ollama.new(api_key: "123") }
+    let(:calculator) { Langchain::Tool::Calculator.new }
+    let(:instructions) { "You are an expert assistant" }
+
+    subject {
+      described_class.new(
+        llm: llm,
+        tools: [calculator],
+        instructions: instructions
+      )
+    }
+
     xdescribe "#set_state_for" do
       xcontext "when response contains completion" do
         let(:response) { double(tool_calls: [], completion: "The weather in SF is sunny") }
@@ -1271,6 +1294,16 @@ RSpec.describe Langchain::Assistant do
         xit "it returns :completed" do
           expect(subject.send(:set_state_for, response: response)).to eq(:completed)
         end
+      end
+    end
+
+    describe "#instructions=" do
+      it "resets instructions" do
+        subject.instructions = "New instructions"
+        expect(subject.messages).to match_array(
+          an_object_having_attributes(role: "system", content: "New instructions")
+        )
+        expect(subject.instructions).to eq("New instructions")
       end
     end
   end
