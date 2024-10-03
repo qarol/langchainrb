@@ -192,9 +192,8 @@ module Langchain
       @instructions = new_instructions
 
       # This only needs to be done that support Message#@role="system"
-      if !llm.is_a?(Langchain::LLM::GoogleGemini) &&
-          !llm.is_a?(Langchain::LLM::GoogleVertexAI) &&
-          !llm.is_a?(Langchain::LLM::Anthropic)
+      if !@llm_adapter.is_a?(LLM::Adapters::GoogleGemini) &&
+          !@llm_adapter.is_a?(LLM::Adapters::Anthropic)
         # Find message with role: "system" in messages and delete it from the messages array
         replace_system_message!(content: new_instructions)
       end
@@ -334,22 +333,22 @@ module Langchain
     #
     # @return [String] The tool role
     def determine_tool_role
-      case llm
-      when Langchain::LLM::Anthropic
+      case @llm_adapter
+      when LLM::Adapters::Anthropic
         Langchain::Messages::AnthropicMessage::TOOL_ROLE
-      when Langchain::LLM::GoogleGemini, Langchain::LLM::GoogleVertexAI
+      when LLM::Adapters::GoogleGemini
         Langchain::Messages::GoogleGeminiMessage::TOOL_ROLE
-      when Langchain::LLM::MistralAI
+      when LLM::Adapters::MistralAI
         Langchain::Messages::MistralAIMessage::TOOL_ROLE
-      when Langchain::LLM::Ollama
+      when LLM::Adapters::Ollama
         Langchain::Messages::OllamaMessage::TOOL_ROLE
-      when Langchain::LLM::OpenAI
+      when LLM::Adapters::OpenAI
         Langchain::Messages::OpenAIMessage::TOOL_ROLE
       end
     end
 
     def initialize_instructions
-      if llm.is_a?(Langchain::LLM::OpenAI) || llm.is_a?(Langchain::LLM::MistralAI)
+      if @llm_adapter.is_a?(LLM::Adapters::OpenAI) || @llm_adapter.is_a?(LLM::Adapters::MistralAI)
         self.instructions = @instructions if @instructions
       end
     end
@@ -366,7 +365,7 @@ module Langchain
         tools: @tools,
         tool_choice: tool_choice
       )
-      @llm.chat(**params, &@block)
+      @llm_adapter.chat(**params, &@block)
     end
 
     # Run the tools automatically

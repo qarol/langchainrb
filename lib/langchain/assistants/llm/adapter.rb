@@ -8,15 +8,15 @@ module Langchain
         def self.build(llm)
           case llm
           when Langchain::LLM::Anthropic
-            LLM::Adapters::Anthropic.new
+            LLM::Adapters::Anthropic.new(llm)
           when Langchain::LLM::GoogleGemini, Langchain::LLM::GoogleVertexAI
-            LLM::Adapters::GoogleGemini.new
+            LLM::Adapters::GoogleGemini.new(llm)
           when Langchain::LLM::MistralAI
-            LLM::Adapters::MistralAI.new
+            LLM::Adapters::MistralAI.new(llm)
           when Langchain::LLM::Ollama
-            LLM::Adapters::Ollama.new
+            LLM::Adapters::Ollama.new(llm)
           when Langchain::LLM::OpenAI
-            LLM::Adapters::OpenAI.new
+            LLM::Adapters::OpenAI.new(llm)
           else
             raise ArgumentError, "Unsupported LLM type: #{llm.class}"
           end
