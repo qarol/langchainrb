@@ -337,7 +337,9 @@ module Langchain
     end
 
     def initialize_instructions
-      if @llm_adapter.is_a?(LLM::Adapters::OpenAI) || @llm_adapter.is_a?(LLM::Adapters::MistralAI)
+      if @llm_adapter.is_a?(LLM::Adapters::OpenAI) ||
+          @llm_adapter.is_a?(LLM::Adapters::MistralAI) ||
+          @llm_adapter.is_a?(LLM::Adapters::Ollama)
         self.instructions = @instructions if @instructions
       end
     end
