@@ -343,7 +343,7 @@ module Langchain
         tools: @tools,
         tool_choice: tool_choice
       )
-      @llm_adapter.chat(**params, &@block)
+      @llm.chat(**params, &@block)
     end
 
     # Run the tools automatically

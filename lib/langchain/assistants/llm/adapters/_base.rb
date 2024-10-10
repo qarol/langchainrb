@@ -3,10 +3,6 @@ module Langchain
     module LLM
       module Adapters
         class Base
-          def initialize(llm)
-            @llm = llm
-          end
-
           def build_chat_params(tools:, instructions:, messages:, tool_choice:)
             raise NotImplementedError, "Subclasses must implement build_chat_params"
           end
@@ -25,10 +21,6 @@ module Langchain
 
           def support_system_message?
             raise NotImplementedError, "Subclasses must implement set_instructions"
-          end
-
-          def chat(*args, **kwargs, &block)
-            @llm.chat(*args, **kwargs, &block)
           end
         end
       end
