@@ -49,6 +49,10 @@ module Langchain
             Langchain::Messages::OllamaMessage::TOOL_ROLE
           end
 
+          def support_system_message?
+            true
+          end
+
           private
 
           def build_tools(tools)
