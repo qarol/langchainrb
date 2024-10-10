@@ -50,17 +50,13 @@ module Langchain
       self.messages = messages
       @tools = tools
       self.tool_choice = tool_choice
-      @instructions = instructions
+      self.instructions = instructions if instructions
       @block = block
       @state = :ready
 
       @total_prompt_tokens = 0
       @total_completion_tokens = 0
       @total_tokens = 0
-
-      # The first message in the messages array should be the system instructions
-      # For Google Gemini, and Anthropic system instructions are added to the `system:` param in the `chat` method
-      initialize_instructions
     end
 
     # Add a user message to the messages array
@@ -334,14 +330,6 @@ module Langchain
     # @return [String] The tool role
     def determine_tool_role
       @llm_adapter.tool_role
-    end
-
-    def initialize_instructions
-      if @llm_adapter.is_a?(LLM::Adapters::OpenAI) ||
-          @llm_adapter.is_a?(LLM::Adapters::MistralAI) ||
-          @llm_adapter.is_a?(LLM::Adapters::Ollama)
-        self.instructions = @instructions if @instructions
-      end
     end
 
     # Call to the LLM#chat() method
