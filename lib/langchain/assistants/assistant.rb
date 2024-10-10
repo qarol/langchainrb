@@ -333,18 +333,7 @@ module Langchain
     #
     # @return [String] The tool role
     def determine_tool_role
-      case @llm_adapter
-      when LLM::Adapters::Anthropic
-        Langchain::Messages::AnthropicMessage::TOOL_ROLE
-      when LLM::Adapters::GoogleGemini
-        Langchain::Messages::GoogleGeminiMessage::TOOL_ROLE
-      when LLM::Adapters::MistralAI
-        Langchain::Messages::MistralAIMessage::TOOL_ROLE
-      when LLM::Adapters::Ollama
-        Langchain::Messages::OllamaMessage::TOOL_ROLE
-      when LLM::Adapters::OpenAI
-        Langchain::Messages::OpenAIMessage::TOOL_ROLE
-      end
+      @llm_adapter.tool_role
     end
 
     def initialize_instructions

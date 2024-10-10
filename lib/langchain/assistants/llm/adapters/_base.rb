@@ -19,6 +19,10 @@ module Langchain
             raise NotImplementedError, "Subclasses must implement build_message"
           end
 
+          def tool_role
+            raise NotImplementedError, "Subclasses must implement tool_role"
+          end
+
           def chat(*args, **kwargs, &block)
             @llm.chat(*args, **kwargs, &block)
           end
